@@ -1,11 +1,11 @@
-import { Code, PenTool, TrendingUp, Cpu, CircleCheck } from 'lucide-react';
-import { Logo } from '../components/ui.jsx';
+import { Code, PenTool, TrendingUp, ShieldCheck, CircleCheck } from 'lucide-react';
+import { Logo, ThemeToggle } from '../components/ui.jsx';
 
 const FLOATING = [
   { icon: Code, label: 'Pemrograman', color: '#3B78F2', title: 'Variabel & Tipe Data' },
   { icon: PenTool, label: 'Desain Grafis', color: '#EC5C93', title: 'Prinsip Hierarki' },
   { icon: TrendingUp, label: 'Digital Marketing', color: '#F7AE36', title: 'Funnel Pemasaran' },
-  { icon: Cpu, label: 'Teknologi', color: '#9168F7', title: 'Cara Kerja Internet' },
+  { icon: ShieldCheck, label: 'Keamanan Siber', color: '#64748B', title: 'Mengenal SIEM' },
 ];
 
 export default function AuthLayout({ title, subtitle, children }) {
@@ -17,7 +17,7 @@ export default function AuthLayout({ title, subtitle, children }) {
           <h2>Skill praktis, dipelajari dengan ritmemu sendiri.</h2>
           <p>
             Artikel, video tutorial, kuis, dan latihan praktik di bidang pemrograman, desain grafis,
-            digital marketing, dan teknologi.
+            digital marketing, teknologi, dan keamanan siber.
           </p>
           <ul className="auth__points">
             <li>
@@ -47,6 +47,7 @@ export default function AuthLayout({ title, subtitle, children }) {
       </aside>
 
       <section className="auth__form-wrap">
+        <ThemeToggle className="theme-toggle--corner" />
         <div className="auth__form">
           <div className="auth__logo-mobile">
             <Logo />

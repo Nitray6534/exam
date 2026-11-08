@@ -1,26 +1,47 @@
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Heart, Moon, Sun } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext.jsx';
 import { categoryMeta, typeMeta, formatDuration } from '../lib/meta.js';
 
 export function Logo({ light = false }) {
   return (
     <span className={`logo ${light ? 'logo--light' : ''}`}>
       <svg viewBox="0 0 64 64" width="32" height="32" aria-hidden>
-        <rect width="64" height="64" rx="16" fill={light ? '#FFFFFF' : '#0F4C45'} />
+        <rect width="64" height="64" rx="16" fill={light ? '#FFFFFF' : '#5B21B6'} />
         <path
-          d="M20 40c0 4 4 7 12 7s12-3 12-8c0-11-24-6-24-16 0-4 4-7 11-7 6 0 10 2 11 6"
-          fill="none"
-          stroke={light ? '#0F4C45' : '#FFFFFF'}
-          strokeWidth="6"
-          strokeLinecap="round"
+          d="M32 9 L50 15.5 V30 C50 42.5 42.2 50.6 32 55 C21.8 50.6 14 42.5 14 30 V15.5 Z"
+          fill={light ? '#5B21B6' : '#FFFFFF'}
         />
-        <circle cx="47" cy="17" r="5" fill="#FF7A59" />
+        <path d="M31 25.5 C27.6 23.6 23.8 23.2 20.5 24 V40.5 C23.8 39.7 27.6 40.1 31 42 Z" fill={light ? '#FFFFFF' : '#5B21B6'} />
+        <path d="M33 25.5 C36.4 23.6 40.2 23.2 43.5 24 V40.5 C40.2 39.7 36.4 40.1 33 42 Z" fill="#14B8A6" />
       </svg>
       <span className="logo__text">
         Skill<span>Learn</span>
       </span>
     </span>
   );
+}
+
+export function ThemeToggle({ className = '' }) {
+  const { dark, toggle } = useTheme();
+  return (
+    <button
+      type="button"
+      className={`theme-toggle ${className}`}
+      onClick={toggle}
+      aria-label={dark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
+      title={dark ? 'Mode terang' : 'Mode gelap'}
+    >
+      {dark ? <Sun size={18} aria-hidden /> : <Moon size={18} aria-hidden />}
+    </button>
+  );
+}
+
+// Warna teks kategori menyesuaikan tema terang/gelap.
+export function useCategoryColors(category) {
+  const { dark } = useTheme();
+  const cat = categoryMeta(category);
+  return { ...cat, fg: dark ? cat.fgDark : cat.fg, soft: dark ? cat.softDark : cat.soft };
 }
 
 export function ProgressBar({ value = 0, size = 'md', label }) {
@@ -84,7 +105,7 @@ export function CoverArt({ category, type, size = 'md', showType = true }) {
 }
 
 export function CategoryTag({ category }) {
-  const cat = categoryMeta(category);
+  const cat = useCategoryColors(category);
   return (
     <span className="cat-tag" style={{ color: cat.fg, background: cat.soft }}>
       {cat.name}

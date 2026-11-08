@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   Animated,
+  Image,
   Platform,
   Pressable,
   StyleSheet,
@@ -11,7 +12,8 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { colors, font, radius, categoryMeta, typeMeta, formatDuration } from '../theme';
+import { font, radius, categoryMeta, categoryColors, typeMeta, formatDuration } from '../theme';
+import { useTheme, useStyles } from '../context/ThemeContext';
 
 /* ---------- Typography ---------- */
 const WEIGHT = {
@@ -22,33 +24,29 @@ const WEIGHT = {
   extrabold: font.extrabold,
 };
 
-export function T({ weight = 'regular', size = 15, color = colors.ink, style, ...props }) {
+export function T({ weight = 'regular', size = 15, color, style, ...props }) {
+  const { colors } = useTheme();
   return (
     <Text
       {...props}
-      style={[{ fontFamily: WEIGHT[weight], fontSize: size, color, lineHeight: Math.round(size * 1.45) }, style]}
+      style={[
+        { fontFamily: WEIGHT[weight], fontSize: size, color: color ?? colors.text, lineHeight: Math.round(size * 1.45) },
+        style,
+      ]}
     />
   );
 }
 
 /* ---------- Logo ---------- */
 export function Logo({ light = false, size = 32 }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   return (
     <View style={styles.logo}>
-      <View
-        style={[
-          styles.logoMark,
-          { width: size, height: size, borderRadius: size * 0.25, backgroundColor: light ? '#fff' : colors.pine800 },
-        ]}
-      >
-        <T weight="extrabold" size={size * 0.62} color={light ? colors.pine800 : '#fff'} style={{ lineHeight: size }}>
-          S
-        </T>
-        <View style={[styles.logoDot, { width: size * 0.16, height: size * 0.16, borderRadius: size }]} />
-      </View>
-      <T weight="extrabold" size={size * 0.62} color={light ? '#fff' : colors.ink}>
+      <Image source={light ? LOGO_LIGHT : LOGO} style={{ width: size, height: size }} accessibilityIgnoresInvertColors />
+      <T weight="extrabold" size={size * 0.62} color={light ? '#fff' : colors.text}>
         Skill
-        <T weight="extrabold" size={size * 0.62} color={light ? '#fff' : colors.pine800}>
+        <T weight="extrabold" size={size * 0.62} color={light ? '#fff' : colors.primaryText}>
           Learn
         </T>
       </T>
@@ -56,9 +54,14 @@ export function Logo({ light = false, size = 32 }) {
   );
 }
 
+const LOGO = require('../../assets/logo-mark.png');
+const LOGO_LIGHT = require('../../assets/logo-mark-light.png');
+
 /* ---------- Button ---------- */
 export function Button({ title, onPress, variant = 'primary', icon, disabled, loading, style, small }) {
-  const v = BUTTON[variant];
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
+  const v = buttonTones(colors)[variant];
   return (
     <Pressable
       onPress={onPress}
@@ -88,15 +91,17 @@ export function Button({ title, onPress, variant = 'primary', icon, disabled, lo
   );
 }
 
-const BUTTON = {
-  primary: { bg: colors.pine800, fg: '#fff', border: colors.pine800 },
-  secondary: { bg: colors.surface, fg: colors.ink, border: colors.lineStrong },
-  favorite: { bg: colors.coral100, fg: colors.coral700, border: '#FFC9B8' },
-  danger: { bg: 'transparent', fg: colors.red600, border: '#F3C7C5' },
-};
+const buttonTones = (colors) => ({
+  primary: { bg: colors.primary, fg: '#fff', border: colors.primary },
+  secondary: { bg: colors.surface, fg: colors.text, border: colors.lineStrong },
+  favorite: { bg: colors.accentSoft, fg: colors.accentText, border: colors.accent },
+  danger: { bg: 'transparent', fg: colors.danger, border: colors.dangerBorder },
+});
 
 /* ---------- Input ---------- */
 export function Input({ label, icon, error, hint, secure, ...props }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   const [hidden, setHidden] = useState(true);
   const [focused, setFocused] = useState(false);
   return (
@@ -107,15 +112,15 @@ export function Input({ label, icon, error, hint, secure, ...props }) {
       <View
         style={[
           styles.input,
-          focused && { borderColor: colors.pine800 },
-          error && { borderColor: colors.red600 },
+          focused && { borderColor: colors.primary },
+          error && { borderColor: colors.danger },
         ]}
       >
-        {icon && <Feather name={icon} size={18} color={colors.ink3} />}
+        {icon && <Feather name={icon} size={18} color={colors.text3} />}
         <TextInput
           {...props}
           secureTextEntry={secure && hidden}
-          placeholderTextColor="#8E9895"
+          placeholderTextColor={colors.placeholder}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           style={styles.inputField}
@@ -127,12 +132,12 @@ export function Input({ label, icon, error, hint, secure, ...props }) {
             hitSlop={10}
             accessibilityLabel={hidden ? 'Tampilkan password' : 'Sembunyikan password'}
           >
-            <Feather name={hidden ? 'eye' : 'eye-off'} size={18} color={colors.ink3} />
+            <Feather name={hidden ? 'eye' : 'eye-off'} size={18} color={colors.text3} />
           </Pressable>
         )}
       </View>
       {(error || hint) && (
-        <T size={13} weight={error ? 'semibold' : 'regular'} color={error ? colors.red600 : colors.ink3}>
+        <T size={13} weight={error ? 'semibold' : 'regular'} color={error ? colors.danger : colors.text3}>
           {error || hint}
         </T>
       )}
@@ -141,16 +146,17 @@ export function Input({ label, icon, error, hint, secure, ...props }) {
 }
 
 /* ---------- Progress ---------- */
-export function ProgressBar({ value = 0, height = 8, track = colors.line }) {
+export function ProgressBar({ value = 0, height = 8, track }) {
+  const { colors } = useTheme();
   const v = Math.max(0, Math.min(100, value));
   return (
     <View
-      style={{ height, borderRadius: 99, backgroundColor: track, overflow: 'hidden' }}
+      style={{ height, borderRadius: 99, backgroundColor: track ?? colors.line, overflow: 'hidden' }}
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now: v }}
     >
       <LinearGradient
-        colors={[colors.coral500, colors.coral600]}
+        colors={[colors.accent, colors.accentStrong]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={{ width: `${v}%`, height: '100%', borderRadius: 99 }}
@@ -161,6 +167,8 @@ export function ProgressBar({ value = 0, height = 8, track = colors.line }) {
 
 /* ---------- Cover art ---------- */
 export function Cover({ category, type, height = 140, rounded = 0, showType = true, iconSize = 120, style }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   const cat = categoryMeta(category);
   const t = typeMeta(type);
   const small = height < 70;
@@ -183,8 +191,8 @@ export function Cover({ category, type, height = 140, rounded = 0, showType = tr
       />
       {showType && (
         <View style={styles.typeBadge}>
-          <Feather name={t.icon} size={13} color={colors.ink} />
-          <T weight="bold" size={12}>
+          <Feather name={t.icon} size={13} color="#1B1630" />
+          <T weight="bold" size={12} color="#1B1630">
             {t.label}
           </T>
         </View>
@@ -194,7 +202,9 @@ export function Cover({ category, type, height = 140, rounded = 0, showType = tr
 }
 
 export function CategoryTag({ category }) {
-  const cat = categoryMeta(category);
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
+  const cat = categoryColors(category, dark);
   return (
     <View style={[styles.tag, { backgroundColor: cat.soft }]}>
       <T weight="bold" size={12} color={cat.fg}>
@@ -205,6 +215,8 @@ export function CategoryTag({ category }) {
 }
 
 export function FavoriteButton({ active, onPress, size = 38 }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   return (
     <Pressable
       onPress={onPress}
@@ -213,13 +225,15 @@ export function FavoriteButton({ active, onPress, size = 38 }) {
       accessibilityLabel={active ? 'Hapus dari favorit' : 'Simpan ke favorit'}
       style={[styles.favBtn, { width: size, height: size, borderRadius: size / 2 }]}
     >
-      <Ionicons name={active ? 'heart' : 'heart-outline'} size={size * 0.5} color={active ? colors.coral600 : colors.ink2} />
+      <Ionicons name={active ? 'heart' : 'heart-outline'} size={size * 0.5} color={active ? colors.accentStrong : colors.text2} />
     </Pressable>
   );
 }
 
 /* ---------- Material card ---------- */
 export function MaterialCard({ material, onPress, onToggleFavorite }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   const { title, summary, category, type, level, durationMinutes, isFavorite, progress, completed } = material;
   return (
     <Pressable
@@ -239,11 +253,11 @@ export function MaterialCard({ material, onPress, onToggleFavorite }) {
         <T weight="extrabold" size={17} numberOfLines={2} style={{ marginTop: 10, marginBottom: 4 }}>
           {title}
         </T>
-        <T size={14} color={colors.ink2} numberOfLines={2}>
+        <T size={14} color={colors.text2} numberOfLines={2}>
           {summary}
         </T>
         <View style={styles.cardMeta}>
-          <T weight="semibold" size={13} color={colors.ink3}>
+          <T weight="semibold" size={13} color={colors.text3}>
             {level} · {formatDuration(durationMinutes)}
           </T>
           {completed && <Pill label="Selesai" />}
@@ -253,7 +267,7 @@ export function MaterialCard({ material, onPress, onToggleFavorite }) {
             <View style={{ flex: 1 }}>
               <ProgressBar value={progress} height={6} />
             </View>
-            <T weight="bold" size={12} color={colors.ink2}>
+            <T weight="bold" size={12} color={colors.text2}>
               {progress}%
             </T>
           </View>
@@ -264,7 +278,9 @@ export function MaterialCard({ material, onPress, onToggleFavorite }) {
 }
 
 export function Pill({ label, tone = 'done' }) {
-  const t = tone === 'done' ? { bg: colors.green100, fg: '#166534' } : { bg: colors.pine50, fg: colors.pine800 };
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
+  const t = tone === 'done' ? { bg: colors.successBg, fg: colors.successText } : { bg: colors.primarySofter, fg: colors.primaryText };
   return (
     <View style={[styles.pill, { backgroundColor: t.bg }]}>
       <T weight="bold" size={12} color={t.fg}>
@@ -276,10 +292,12 @@ export function Pill({ label, tone = 'done' }) {
 
 /* ---------- States ---------- */
 export function Loading({ label = 'Memuat...' }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   return (
     <View style={styles.center}>
-      <ActivityIndicator color={colors.pine800} size="large" />
-      <T weight="semibold" color={colors.ink3}>
+      <ActivityIndicator color={colors.primaryText} size="large" />
+      <T weight="semibold" color={colors.text3}>
         {label}
       </T>
     </View>
@@ -287,15 +305,17 @@ export function Loading({ label = 'Memuat...' }) {
 }
 
 export function EmptyState({ icon, title, text, action }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   return (
     <View style={styles.empty}>
       <View style={styles.emptyIcon}>
-        <Feather name={icon} size={28} color={colors.coral700} />
+        <Feather name={icon} size={28} color={colors.accentText} />
       </View>
       <T weight="extrabold" size={18} style={{ textAlign: 'center' }}>
         {title}
       </T>
-      <T color={colors.ink2} style={{ textAlign: 'center', marginBottom: 8 }}>
+      <T color={colors.text2} style={{ textAlign: 'center', marginBottom: 8 }}>
         {text}
       </T>
       {action}
@@ -304,11 +324,13 @@ export function EmptyState({ icon, title, text, action }) {
 }
 
 export function ErrorBox({ message }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   if (!message) return null;
   return (
     <View style={styles.errorBox} accessibilityRole="alert">
-      <Feather name="alert-circle" size={18} color="#8F1D1D" />
-      <T weight="semibold" size={14} color="#8F1D1D" style={{ flex: 1 }}>
+      <Feather name="alert-circle" size={18} color={colors.dangerText} />
+      <T weight="semibold" size={14} color={colors.dangerText} style={{ flex: 1 }}>
         {message}
       </T>
     </View>
@@ -319,6 +341,8 @@ export function ErrorBox({ message }) {
 const ToastContext = createContext(() => {});
 
 export function ToastProvider({ children }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   const [toast, setToast] = useState(null);
   const opacity = useRef(new Animated.Value(0)).current;
   const timer = useRef();
@@ -343,9 +367,9 @@ export function ToastProvider({ children }) {
           <Feather
             name={toast.tone === 'error' ? 'alert-circle' : 'check-circle'}
             size={18}
-            color={toast.tone === 'error' ? '#FCA5A5' : '#6EE7B7'}
+            color={toast.tone === 'error' ? colors.toastErr : colors.toastOk}
           />
-          <T weight="semibold" size={14} color="#fff">
+          <T weight="semibold" size={14} color={colors.toastText}>
             {toast.message}
           </T>
         </Animated.View>
@@ -356,10 +380,11 @@ export function ToastProvider({ children }) {
 
 export const useToast = () => useContext(ToastContext);
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) =>
+  StyleSheet.create({
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   logoMark: { alignItems: 'center', justifyContent: 'center' },
-  logoDot: { position: 'absolute', top: '16%', right: '16%', backgroundColor: colors.coral500 },
+  logoDot: { position: 'absolute', top: '16%', right: '16%', backgroundColor: colors.accent },
   btn: {
     minHeight: 50,
     paddingHorizontal: 20,
@@ -387,7 +412,7 @@ const styles = StyleSheet.create({
     height: '100%',
     fontFamily: font.medium,
     fontSize: 15,
-    color: colors.ink,
+    color: colors.text,
     ...(Platform.OS === 'web' ? { outlineStyle: 'none' } : null),
   },
   typeBadge: {
@@ -406,7 +431,7 @@ const styles = StyleSheet.create({
   favBtn: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.96)',
+    backgroundColor: colors.overlay,
     shadowColor: '#000',
     shadowOpacity: 0.18,
     shadowRadius: 8,
@@ -441,7 +466,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.coral100,
+    backgroundColor: colors.accentSoft,
     marginBottom: 6,
   },
   errorBox: {
@@ -450,7 +475,7 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 12,
     borderRadius: 12,
-    backgroundColor: colors.red100,
+    backgroundColor: colors.dangerBg,
   },
   toast: {
     position: 'absolute',
@@ -462,6 +487,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 14,
-    backgroundColor: colors.ink,
+    backgroundColor: colors.toastBg,
   },
 });

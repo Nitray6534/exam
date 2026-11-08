@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { House, Heart, History, User, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { initials } from '../lib/meta.js';
-import { Logo } from './ui.jsx';
+import { Logo, ThemeToggle } from './ui.jsx';
 
 const NAV = [
   { to: '/', label: 'Beranda', icon: House, end: true },
@@ -48,6 +48,8 @@ export default function AppLayout() {
             ))}
           </nav>
 
+          <div className="topbar__actions">
+          <ThemeToggle />
           <div className="usermenu" ref={menuRef}>
             <button
               type="button"
@@ -74,6 +76,7 @@ export default function AppLayout() {
                 </button>
               </div>
             )}
+          </div>
           </div>
         </div>
       </header>

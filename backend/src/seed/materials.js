@@ -3,6 +3,7 @@ const P = 'pemrograman';
 const D = 'desain-grafis';
 const M = 'digital-marketing';
 const T = 'teknologi';
+const K = 'keamanan-siber';
 
 const subtitleNote = 'Video berbahasa Inggris, aktifkan subtitle bila perlu';
 
@@ -139,7 +140,7 @@ export const materials = [
     order: 4,
     title: 'Latihan: Mengamankan Akun dengan 2FA dan Password Manager',
     slug: 'latihan-keamanan-akun',
-    category: T,
+    category: K,
     type: 'latihan',
     level: 'Pemula',
     durationMinutes: 30,
@@ -299,7 +300,7 @@ export const materials = [
     order: 8,
     title: 'Kuis Keamanan Siber Dasar',
     slug: 'kuis-keamanan-siber',
-    category: T,
+    category: K,
     type: 'kuis',
     level: 'Pemula',
     durationMinutes: 5,
@@ -651,6 +652,174 @@ export const materials = [
         'Ketik ulang setiap contoh kode, jangan hanya menonton',
         'Tandai bagian yang belum dipahami lalu ulangi lewat materi artikel',
         subtitleNote,
+      ],
+    },
+  },
+  {
+    order: 18,
+    title: 'Mengenal SIEM: Dari Log Menjadi Alert',
+    slug: 'mengenal-siem',
+    category: K,
+    type: 'artikel',
+    level: 'Pemula',
+    durationMinutes: 10,
+    summary:
+      'Bagaimana SIEM mengumpulkan log dari banyak sumber, menyeragamkannya, lalu mengubahnya menjadi alert yang bisa ditindaklanjuti tim SOC.',
+    tags: ['siem', 'log', 'soc', 'deteksi'],
+    blocks: [
+      {
+        kind: 'paragraph',
+        text: 'Setiap server, firewall, aplikasi, dan laptop di sebuah organisasi menghasilkan log. Satu perangkat saja bisa mencatat ribuan kejadian per menit. SIEM (Security Information and Event Management) mengumpulkan log dari banyak sumber ke satu tempat, menyeragamkan formatnya, lalu mencari pola yang menandakan serangan.',
+      },
+      { kind: 'heading', text: '1. Pengumpulan log' },
+      {
+        kind: 'paragraph',
+        text: 'Log dikirim dari berbagai sumber, misalnya Windows Event Log, syslog dari firewall dan server Linux, log aplikasi web, sampai log layanan cloud. Pengiriman biasanya memakai agent atau connector yang dipasang di dekat sumber log.',
+      },
+      { kind: 'heading', text: '2. Normalisasi' },
+      {
+        kind: 'paragraph',
+        text: 'Setiap vendor punya format log sendiri. SIEM memetakan field penting ke skema yang seragam, seperti waktu kejadian, IP sumber, user, aksi, dan hasil. Tanpa normalisasi, satu aturan deteksi harus ditulis ulang untuk setiap jenis log.',
+      },
+      { kind: 'heading', text: '3. Korelasi dan rule' },
+      {
+        kind: 'paragraph',
+        text: 'Rule korelasi menggabungkan beberapa event menjadi satu kesimpulan. Contoh sederhana untuk mendeteksi brute force yang berhasil:',
+      },
+      {
+        kind: 'code',
+        text: 'JIKA  login gagal >= 5 kali\nDAN   setelahnya ada login berhasil\nDARI  IP sumber yang sama ke user yang sama\nDALAM 10 menit\nMAKA  buat alert "Kemungkinan brute force berhasil" (severity tinggi)',
+      },
+      { kind: 'heading', text: '4. Alert dan triage' },
+      {
+        kind: 'paragraph',
+        text: 'Alert masuk ke antrean analis SOC. Analis memeriksa konteksnya: siapa user-nya, apakah IP-nya wajar, dan apa yang terjadi setelah login. Setelah itu analis memutuskan apakah ini insiden nyata atau false positive. Rule yang terlalu sensitif menghasilkan banyak false positive dan membuat analis kewalahan.',
+      },
+      {
+        kind: 'list',
+        items: [
+          'Contoh SIEM komersial: Splunk Enterprise Security, OpenText ArcSight, dan Microsoft Sentinel.',
+          'Contoh SIEM open source: Wazuh.',
+        ],
+      },
+      {
+        kind: 'tip',
+        text: 'Mulailah dari pertanyaan "serangan apa yang paling ingin dideteksi?", baru tentukan log apa yang wajib dikumpulkan. Mengumpulkan semua log tanpa tujuan hanya membuat biaya penyimpanan membengkak.',
+      },
+    ],
+  },
+  {
+    order: 19,
+    title: 'Arsitektur Keamanan Siber: Deteksi',
+    slug: 'video-deteksi-ibm',
+    category: K,
+    type: 'video',
+    level: 'Menengah',
+    durationMinutes: 15,
+    summary:
+      'Penjelasan IBM Technology tentang cara organisasi mendeteksi serangan, termasuk peran SIEM dan XDR dalam arsitektur keamanan.',
+    author: 'IBM Technology',
+    tags: ['siem', 'xdr', 'deteksi'],
+    video: {
+      youtubeId: 'VEu326IZpsc',
+      channel: 'IBM Technology',
+      sourceTitle: 'Cybersecurity Architecture: Detection',
+      keyPoints: [
+        'Catat perbedaan SIEM dan XDR yang dijelaskan',
+        'Perhatikan sumber data apa saja yang dipakai untuk mendeteksi serangan',
+        'Hubungkan isi video dengan alur di artikel Mengenal SIEM',
+        subtitleNote,
+      ],
+    },
+  },
+  {
+    order: 20,
+    title: 'Kuis Broken Access Control dan IDOR',
+    slug: 'kuis-broken-access-control',
+    category: K,
+    type: 'kuis',
+    level: 'Menengah',
+    durationMinutes: 5,
+    summary: 'Lima soal tentang celah kontrol akses, IDOR, dan cara mendeteksinya dari log.',
+    tags: ['owasp', 'idor', 'access control'],
+    quiz: [
+      {
+        question: 'Kategori nomor satu (A01) pada OWASP Top 10:2025 adalah...',
+        options: ['Injection', 'Broken Access Control', 'Security Misconfiguration', 'Cryptographic Failures'],
+        answerIndex: 1,
+        explanation: 'Broken Access Control menempati posisi A01 di OWASP Top 10:2025, sama seperti pada edisi 2021.',
+      },
+      {
+        question:
+          'Pengguna A membuka /api/orders/1002, lalu mengganti angkanya menjadi /api/orders/1003 dan berhasil melihat pesanan milik pengguna B. Celah ini disebut...',
+        options: [
+          'Cross-Site Scripting (XSS)',
+          'Insecure Direct Object Reference (IDOR)',
+          'SQL Injection',
+          'Clickjacking',
+        ],
+        answerIndex: 1,
+        explanation: 'IDOR terjadi ketika server memberikan objek berdasarkan ID tanpa memeriksa apakah pemintanya berhak.',
+      },
+      {
+        question: 'Cara paling tepat untuk mencegah IDOR adalah...',
+        options: [
+          'Menyembunyikan ID dari URL',
+          'Mengganti ID angka dengan UUID',
+          'Memeriksa di server bahwa objek yang diminta memang boleh diakses oleh pengguna yang sedang login',
+          'Menonaktifkan klik kanan di browser',
+        ],
+        answerIndex: 2,
+        explanation:
+          'UUID hanya mempersulit tebakan, bukan kontrol akses. Pemeriksaan otorisasi di server pada setiap request adalah perbaikan yang sebenarnya. SkillLearn melakukannya dengan selalu memfilter riwayat dan favorit berdasarkan user dari token.',
+      },
+      {
+        question: 'Status HTTP yang tepat ketika pengguna sudah login tetapi tidak berhak mengakses suatu resource adalah...',
+        options: ['200 OK', '401 Unauthorized', '403 Forbidden', '500 Internal Server Error'],
+        answerIndex: 2,
+        explanation: '401 dipakai ketika pengguna belum terautentikasi, sedangkan 403 dipakai ketika pengguna sudah dikenal tetapi tidak memiliki izin.',
+      },
+      {
+        question: 'Pola log yang paling mencurigakan sebagai percobaan IDOR adalah...',
+        options: [
+          'Satu user membuka profilnya sendiri berulang kali',
+          'Satu user meminta puluhan ID objek berurutan dalam waktu singkat dan banyak yang ditolak 403 atau 404',
+          'Banyak user login pada jam kerja',
+          'Server mengirim response 200 untuk halaman beranda',
+        ],
+        answerIndex: 1,
+        explanation: 'Enumerasi ID secara berurutan dari satu akun adalah tanda khas orang yang sedang menguji celah IDOR.',
+      },
+    ],
+  },
+  {
+    order: 21,
+    title: 'Latihan: Investigasi Login Mencurigakan dari Log',
+    slug: 'latihan-investigasi-log',
+    category: K,
+    type: 'latihan',
+    level: 'Menengah',
+    durationMinutes: 40,
+    summary:
+      'Analisis potongan log autentikasi untuk menemukan brute force, menentukan apakah serangan berhasil, dan menulis rekomendasi.',
+    tags: ['log', 'brute force', 'mitre att&ck'],
+    practice: {
+      goal: 'Menganalisis log autentikasi untuk menemukan percobaan brute force, memastikan apakah serangan berhasil, lalu menuliskan rekomendasi tindak lanjut seperti seorang analis SOC.',
+      tools: ['Log contoh pada langkah 1', 'Text editor atau spreadsheet', 'MITRE ATT&CK (attack.mitre.org)'],
+      steps: [
+        'Salin log contoh berikut ke text editor: 08:01:02 FAIL user=admin ip=203.0.113.45 | 08:01:05 FAIL user=admin ip=203.0.113.45 | 08:01:09 FAIL user=admin ip=203.0.113.45 | 08:01:12 FAIL user=admin ip=203.0.113.45 | 08:01:15 FAIL user=admin ip=203.0.113.45 | 08:01:19 SUCCESS user=admin ip=203.0.113.45 | 08:03:40 SUCCESS user=dina ip=10.10.4.21',
+        'Kelompokkan event berdasarkan IP sumber dan user, lalu hitung jumlah login gagal di setiap kelompok.',
+        'Periksa apakah ada login berhasil setelah rangkaian login gagal dari IP yang sama, dan catat selisih waktunya.',
+        'Petakan pola serangan ke MITRE ATT&CK. Pola ini termasuk teknik T1110 Brute Force.',
+        'Tentukan severity beserta alasannya, misalnya tinggi karena akun admin berhasil diakses dari IP luar.',
+        'Tulis minimal 3 rekomendasi, misalnya reset password admin, blokir IP penyerang, serta aktifkan MFA dan account lockout.',
+      ],
+      checklist: [
+        'IP penyerang sudah teridentifikasi',
+        'Jumlah login gagal sudah dihitung',
+        'Login berhasil setelah serangan sudah ditemukan',
+        'Pola sudah dipetakan ke MITRE ATT&CK T1110',
+        'Ada minimal 3 rekomendasi tindak lanjut',
       ],
     },
   },

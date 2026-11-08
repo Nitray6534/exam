@@ -5,14 +5,17 @@ import { Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useAuth } from '../context/AuthContext';
 import { Button, ErrorBox, Input, Logo, T } from '../components/ui';
-import { colors, radius } from '../theme';
+import { radius } from '../theme';
+import { useTheme, useStyles } from '../context/ThemeContext';
 
 const EMAIL_RX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function AuthShell({ title, subtitle, children, footer }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.pine800 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.panel }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <StatusBar style="light" />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View style={[styles.hero, { paddingTop: insets.top + 24 }]}>
@@ -29,14 +32,14 @@ function AuthShell({ title, subtitle, children, footer }) {
               ['code', '#3B78F2'],
               ['pen-tool', '#EC5C93'],
               ['trending-up', '#F7AE36'],
-              ['cpu', '#9168F7'],
+              ['shield', '#64748B'],
             ].map(([icon, bg]) => (
               <View key={icon} style={[styles.badge, { backgroundColor: bg }]}>
                 <Feather name={icon} size={16} color="#fff" />
               </View>
             ))}
             <T weight="semibold" size={13} color="rgba(255,255,255,0.85)" style={{ marginLeft: 6 }}>
-              4 bidang · artikel, video, kuis, latihan
+              5 bidang · artikel, video, kuis, latihan
             </T>
           </View>
         </View>
@@ -50,6 +53,8 @@ function AuthShell({ title, subtitle, children, footer }) {
 }
 
 export function LoginScreen({ navigation }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -80,9 +85,9 @@ export function LoginScreen({ navigation }) {
       subtitle="Masuk untuk melanjutkan belajarmu."
       footer={
         <View style={styles.switchRow}>
-          <T color={colors.ink2}>Belum punya akun? </T>
+          <T color={colors.text2}>Belum punya akun? </T>
           <Pressable onPress={() => navigation.navigate('Register')} accessibilityRole="link">
-            <T weight="bold" color={colors.pine800}>
+            <T weight="bold" color={colors.primaryText}>
               Daftar sekarang
             </T>
           </Pressable>
@@ -129,6 +134,8 @@ function strengthOf(pw) {
 }
 
 export function RegisterScreen({ navigation }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   const { register } = useAuth();
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
   const [errors, setErrors] = useState({});
@@ -163,7 +170,7 @@ export function RegisterScreen({ navigation }) {
     }
   };
 
-  const strengthColor = [colors.line, colors.red600, '#E3A008', colors.green600][strength];
+  const strengthColor = [colors.line, colors.danger, '#E3A008', colors.success][strength];
   const strengthLabel = ['Terlalu lemah', 'Lemah', 'Cukup', 'Kuat'][strength];
 
   return (
@@ -172,9 +179,9 @@ export function RegisterScreen({ navigation }) {
       subtitle="Gratis. Daftar sekali, akses semua materi."
       footer={
         <View style={styles.switchRow}>
-          <T color={colors.ink2}>Sudah punya akun? </T>
+          <T color={colors.text2}>Sudah punya akun? </T>
           <Pressable onPress={() => navigation.navigate('Login')} accessibilityRole="link">
-            <T weight="bold" color={colors.pine800}>
+            <T weight="bold" color={colors.primaryText}>
               Masuk
             </T>
           </Pressable>
@@ -211,7 +218,7 @@ export function RegisterScreen({ navigation }) {
           {[1, 2, 3].map((n) => (
             <View key={n} style={[styles.strengthBar, { backgroundColor: strength >= n ? strengthColor : colors.line }]} />
           ))}
-          <T size={13} color={colors.ink2} style={{ marginLeft: 6 }}>
+          <T size={13} color={colors.text2} style={{ marginLeft: 6 }}>
             {strengthLabel}
           </T>
         </View>
@@ -230,7 +237,8 @@ export function RegisterScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) =>
+  StyleSheet.create({
   hero: { paddingHorizontal: 24, paddingBottom: 48, overflow: 'hidden' },
   glow: {
     position: 'absolute',
@@ -249,7 +257,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: colors.pine800,
+    borderColor: colors.panel,
   },
   sheet: {
     flex: 1,
@@ -257,7 +265,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 28,
     gap: 16,
-    backgroundColor: colors.cream,
+    backgroundColor: colors.bg,
     borderTopLeftRadius: radius.lg + 6,
     borderTopRightRadius: radius.lg + 6,
   },

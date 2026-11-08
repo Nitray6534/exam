@@ -7,16 +7,19 @@ import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useFavoriteToggle } from '../lib/useFavoriteToggle';
 import { Cover, EmptyState, ErrorBox, Loading, MaterialCard, ProgressBar, T } from '../components/ui';
-import { CATEGORY_META, TYPE_META, colors, font, initials, radius } from '../theme';
+import { CATEGORY_META, TYPE_META, font, initials, radius } from '../theme';
+import { useTheme, useStyles } from '../context/ThemeContext';
 
 function ContinueCard({ entry, onPress }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   if (!entry) {
     return (
       <View style={[styles.continue, styles.continueEmpty]}>
-        <Feather name="zap" size={20} color={colors.coral600} />
+        <Feather name="zap" size={20} color={colors.accentStrong} />
         <View style={{ flex: 1 }}>
           <T weight="bold">Belum ada materi yang dibuka</T>
-          <T size={13} color={colors.ink2}>
+          <T size={13} color={colors.text2}>
             Pilih satu materi di bawah. Progress kamu tersimpan otomatis.
           </T>
         </View>
@@ -28,7 +31,7 @@ function ContinueCard({ entry, onPress }) {
     <Pressable style={styles.continue} onPress={onPress} accessibilityRole="button">
       <Cover category={m.category} type={m.type} height={56} rounded={14} showType={false} style={{ width: 56 }} />
       <View style={{ flex: 1, gap: 2 }}>
-        <T weight="bold" size={11} color={colors.butter300} style={{ letterSpacing: 1 }}>
+        <T weight="bold" size={11} color={colors.highlight} style={{ letterSpacing: 1 }}>
           LANJUTKAN BELAJAR
         </T>
         <T weight="bold" color="#fff" numberOfLines={1}>
@@ -43,12 +46,14 @@ function ContinueCard({ entry, onPress }) {
           </T>
         </View>
       </View>
-      <Feather name="arrow-right" size={20} color={colors.butter300} />
+      <Feather name="arrow-right" size={20} color={colors.highlight} />
     </Pressable>
   );
 }
 
 export default function HomeScreen({ navigation }) {
+  const { colors, dark, toggle } = useTheme();
+  const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const [category, setCategory] = useState('');
@@ -117,34 +122,42 @@ export default function HomeScreen({ navigation }) {
     <View style={{ gap: 18, marginBottom: 18 }}>
       <View style={styles.greetRow}>
         <View style={{ flex: 1 }}>
-          <T weight="semibold" size={14} color={colors.ink2}>
+          <T weight="semibold" size={14} color={colors.text2}>
             Halo, {user?.name?.split(' ')[0]}
           </T>
           <T weight="extrabold" size={24} style={{ lineHeight: 31 }}>
             Mau belajar apa hari ini?
           </T>
         </View>
+        <Pressable
+          onPress={toggle}
+          style={styles.themeBtn}
+          accessibilityRole="button"
+          accessibilityLabel={dark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
+        >
+          <Feather name={dark ? 'sun' : 'moon'} size={19} color={colors.text2} />
+        </Pressable>
         <Pressable onPress={() => navigation.navigate('Profil')} style={styles.avatar} accessibilityLabel="Profil">
-          <T weight="extrabold" size={14}>
+          <T weight="extrabold" size={14} color={colors.avatarText}>
             {initials(user?.name)}
           </T>
         </Pressable>
       </View>
 
       <View style={styles.search}>
-        <Feather name="search" size={20} color={colors.ink3} />
+        <Feather name="search" size={20} color={colors.text3} />
         <TextInput
           value={search}
           onChangeText={setSearch}
           placeholder="Cari figma, javascript, funnel..."
-          placeholderTextColor="#8E9895"
+          placeholderTextColor={colors.placeholder}
           style={styles.searchInput}
           returnKeyType="search"
           accessibilityLabel="Cari materi"
         />
         {search.length > 0 && (
           <Pressable onPress={() => setSearch('')} hitSlop={10} accessibilityLabel="Hapus pencarian">
-            <Feather name="x" size={18} color={colors.ink2} />
+            <Feather name="x" size={18} color={colors.text2} />
           </Pressable>
         )}
       </View>
@@ -166,13 +179,13 @@ export default function HomeScreen({ navigation }) {
               <Feather
                 name={meta ? meta.icon : 'layers'}
                 size={15}
-                color={active ? colors.butter300 : meta ? meta.fg : colors.ink2}
+                color={active ? colors.highlight : meta ? (dark ? meta.fgDark : meta.fg) : colors.text2}
               />
-              <T weight="bold" size={14} color={active ? '#fff' : colors.ink}>
+              <T weight="bold" size={14} color={active ? '#fff' : colors.text}>
                 {c.name}
               </T>
               <View style={[styles.chipCount, active && { backgroundColor: 'rgba(255,255,255,0.18)' }]}>
-                <T weight="semibold" size={12} color={active ? '#fff' : colors.ink2}>
+                <T weight="semibold" size={12} color={active ? '#fff' : colors.text2}>
                   {c.count || ''}
                 </T>
               </View>
@@ -193,7 +206,7 @@ export default function HomeScreen({ navigation }) {
                 accessibilityRole="radio"
                 accessibilityState={{ checked: active }}
               >
-                <T weight={active ? 'bold' : 'semibold'} size={14} color={active ? colors.ink : colors.ink2}>
+                <T weight={active ? 'bold' : 'semibold'} size={14} color={active ? colors.text : colors.text2}>
                   {label}
                 </T>
               </Pressable>
@@ -204,7 +217,7 @@ export default function HomeScreen({ navigation }) {
 
       <T weight="extrabold" size={18}>
         {category ? CATEGORY_META[category].name : 'Semua bidang'}
-        <T weight="semibold" size={18} color={colors.ink3}>
+        <T weight="semibold" size={18} color={colors.text3}>
           {'  '}
           {loading ? '...' : `${items.length} materi`}
         </T>
@@ -215,7 +228,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <FlatList
-      style={{ flex: 1, backgroundColor: colors.cream }}
+      style={{ flex: 1, backgroundColor: colors.bg }}
       contentContainerStyle={{ paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 32 }}
       data={loading ? [] : items}
       keyExtractor={(m) => m.id}
@@ -231,21 +244,32 @@ export default function HomeScreen({ navigation }) {
           <EmptyState icon="search" title="Materi tidak ditemukan" text="Coba kata kunci lain atau ganti filter." />
         )
       }
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.pine800} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primaryText} />}
       keyboardShouldPersistTaps="handled"
     />
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) =>
+  StyleSheet.create({
   greetRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  themeBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
+  },
   avatar: {
     width: 44,
     height: 44,
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.coral500,
+    backgroundColor: colors.avatarBg,
   },
   search: {
     flexDirection: 'row',
@@ -263,7 +287,7 @@ const styles = StyleSheet.create({
     height: '100%',
     fontFamily: font.medium,
     fontSize: 15,
-    color: colors.ink,
+    color: colors.text,
     ...(Platform.OS === 'web' ? { outlineStyle: 'none' } : null),
   },
   continue: {
@@ -272,7 +296,7 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 12,
     borderRadius: radius.lg,
-    backgroundColor: colors.pine800,
+    backgroundColor: colors.panel,
   },
   continueEmpty: {
     backgroundColor: colors.surface,
@@ -294,9 +318,9 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
     backgroundColor: colors.surface,
   },
-  chipActive: { backgroundColor: colors.pine800, borderColor: colors.pine800 },
-  chipCount: { minWidth: 22, paddingHorizontal: 6, borderRadius: 99, backgroundColor: colors.cream, alignItems: 'center' },
-  segmented: { flexDirection: 'row', padding: 4, gap: 2, borderRadius: 12, backgroundColor: '#F1ECE2' },
+  chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chipCount: { minWidth: 22, paddingHorizontal: 6, borderRadius: 99, backgroundColor: colors.surface2, alignItems: 'center' },
+  segmented: { flexDirection: 'row', padding: 4, gap: 2, borderRadius: 12, backgroundColor: colors.segmentBg },
   segment: { height: 36, paddingHorizontal: 14, borderRadius: 9, justifyContent: 'center' },
   segmentActive: {
     backgroundColor: colors.surface,

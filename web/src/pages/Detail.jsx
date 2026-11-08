@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Heart, Clock, Gauge, User, FileQuestion } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 import { categoryMeta, typeMeta, formatDuration } from '../lib/meta.js';
 import { CategoryTag, CoverArt, EmptyState, ProgressBar, Spinner } from '../components/ui.jsx';
 import { ArticleView, PracticeView, QuizView, VideoView } from '../components/MaterialViews.jsx';
@@ -13,6 +14,7 @@ export default function Detail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
+  const { dark } = useTheme();
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
@@ -141,7 +143,7 @@ export default function Detail() {
           <div className="panel">
             <h3>Progress kamu</h3>
             <div className="panel__progress">
-              <strong style={{ color: cat.fg }}>{progress}%</strong>
+              <strong style={{ color: dark ? cat.fgDark : cat.fg }}>{progress}%</strong>
               <span>{history?.completed ? 'Selesai' : progress > 0 ? 'Sedang dipelajari' : 'Belum dimulai'}</span>
             </div>
             <ProgressBar value={progress} />

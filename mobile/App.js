@@ -1,4 +1,5 @@
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { useMemo } from 'react';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,31 +14,28 @@ import {
   PlusJakartaSans_800ExtraBold,
 } from '@expo-google-fonts/plus-jakarta-sans';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { Loading, ToastProvider } from './src/components/ui';
 import { LoginScreen, RegisterScreen } from './src/screens/AuthScreens';
 import HomeScreen from './src/screens/HomeScreen';
 import DetailScreen from './src/screens/DetailScreen';
 import { FavoritesScreen, HistoryScreen, ProfileScreen } from './src/screens/LibraryScreens';
-import { colors, font } from './src/theme';
+import { font } from './src/theme';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-
-const navTheme = {
-  ...DefaultTheme,
-  colors: { ...DefaultTheme.colors, background: colors.cream, primary: colors.pine800 },
-};
 
 const TAB_ICONS = { Beranda: 'home', Favorit: 'heart', Riwayat: 'clock', Profil: 'user' };
 
 function MainTabs() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: colors.pine800,
-        tabBarInactiveTintColor: colors.ink3,
+        tabBarActiveTintColor: colors.primaryText,
+        tabBarInactiveTintColor: colors.text3,
         tabBarLabelStyle: { fontFamily: font.semibold, fontSize: 12 },
         tabBarStyle: {
           borderTopColor: colors.line,
@@ -59,10 +57,11 @@ function MainTabs() {
 
 function RootNavigator() {
   const { user, booting } = useAuth();
+  const { colors } = useTheme();
   if (booting) return <Loading label="Menyiapkan SkillLearn..." />;
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.cream } }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
       {user ? (
         <>
           <Stack.Screen name="Main" component={MainTabs} />
@@ -75,6 +74,35 @@ function RootNavigator() {
         </>
       )}
     </Stack.Navigator>
+  );
+}
+
+function ThemedApp() {
+  const { colors, dark } = useTheme();
+  const navTheme = useMemo(() => {
+    const base = dark ? DarkTheme : DefaultTheme;
+    return {
+      ...base,
+      colors: {
+        ...base.colors,
+        background: colors.bg,
+        card: colors.surface,
+        text: colors.text,
+        border: colors.line,
+        primary: colors.primaryText,
+      },
+    };
+  }, [dark, colors]);
+
+  return (
+    <ToastProvider>
+      <AuthProvider>
+        <NavigationContainer theme={navTheme}>
+          <StatusBar style={dark ? 'light' : 'dark'} />
+          <RootNavigator />
+        </NavigationContainer>
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 
@@ -91,14 +119,9 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <ToastProvider>
-        <AuthProvider>
-          <NavigationContainer theme={navTheme}>
-            <StatusBar style="dark" />
-            <RootNavigator />
-          </NavigationContainer>
-        </AuthProvider>
-      </ToastProvider>
+      <ThemeProvider>
+        <ThemedApp />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

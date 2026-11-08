@@ -1,6 +1,8 @@
 # SkillLearn
 
-Platform belajar keterampilan praktis untuk siswa dan mahasiswa: artikel, video tutorial, kuis, dan latihan praktik di bidang pemrograman, desain grafis, digital marketing, dan teknologi. Pengguna wajib register dan login untuk mengakses materi, bisa menyimpan materi favorit, dan melihat riwayat serta progress belajar.
+Platform belajar keterampilan praktis untuk siswa dan mahasiswa: artikel, video tutorial, kuis, dan latihan praktik di bidang pemrograman, desain grafis, digital marketing, teknologi, dan keamanan siber. Pengguna wajib register dan login untuk mengakses materi, bisa menyimpan materi favorit, dan melihat riwayat serta progress belajar.
+
+Tampilan memakai warna ungu dan tosca dengan logo perisai dan buku, serta mendukung mode terang dan mode gelap. Mode awal mengikuti pengaturan perangkat dan bisa diganti lewat tombol bulan/matahari (web dan mobile) atau switch *Mode gelap* di halaman Profil (mobile). Pilihan disimpan di `localStorage` (web) dan `AsyncStorage` (mobile).
 
 | Bagian | Teknologi | Folder |
 |---|---|---|
@@ -27,7 +29,7 @@ npm run dev:web            # buka http://localhost:5173
 npm run dev:mobile         # scan QR dengan aplikasi Expo Go di HP (Wi-Fi sama dengan laptop)
 ```
 
-Jika `MONGODB_URI` dikosongkan, backend memakai MongoDB in-memory (unduhan otomatis sekali di awal) sehingga bisa langsung dicoba tanpa instalasi MongoDB. Materi awal (17 materi) diisi otomatis saat database masih kosong. Akun demo: `demo@skilllearn.app` / `Demo12345`.
+Jika `MONGODB_URI` dikosongkan, backend memakai MongoDB in-memory (unduhan otomatis sekali di awal) sehingga bisa langsung dicoba tanpa instalasi MongoDB. Materi awal (21 materi di 5 bidang) disinkronkan otomatis setiap server dijalankan: materi baru ditambahkan dan materi lama diperbarui berdasarkan `slug`, tanpa menghapus akun, favorit, atau riwayat. Akun demo: `demo@skilllearn.app` / `Demo12345`.
 
 Saat development, aplikasi mobile otomatis memakai IP laptop (dari Metro) dengan port 5000. Untuk memakai API hosting, buat `mobile/.env` berisi `EXPO_PUBLIC_API_URL=https://<url-render-anda>`.
 
@@ -37,15 +39,8 @@ Test API: `npm test` (13 integration test, memakai MongoDB in-memory).
 
 1. **MongoDB Atlas**: buat cluster M0 (gratis), buat database user, di Network Access izinkan `0.0.0.0/0`, salin connection string.
 2. **Render** (web + API dalam satu service): push folder ini ke GitHub, lalu di Render pilih *New > Blueprint* dan arahkan ke repo. `render.yaml` sudah mengatur build (`npm run build`) dan start (`npm start`). Isi `MONGODB_URI` saat diminta. Setelah deploy, web dan API tersedia di `https://<nama-service>.onrender.com` (API di `/api`).
-3. **Mobile (Expo Go via QR)**: di folder `mobile`, isi `.env` dengan `EXPO_PUBLIC_API_URL`, lalu:
-   ```bash
-   npx eas-cli@latest login
-   npx eas-cli@latest init
-   npx eas-cli@latest update:configure
-   npx eas-cli@latest update --branch preview --message "SkillLearn v1"
-   ```
-   Halaman update di expo.dev menampilkan QR yang bisa dibuka dengan Expo Go.
-4. **APK Android** (opsional): `npx eas-cli@latest build -p android --profile preview` lalu unduh APK dari link yang diberikan.
+3. **Mobile, QR Expo Go**: buat `mobile/.env` berisi `EXPO_PUBLIC_API_URL=https://<url-render-anda>`, lalu di folder `mobile` jalankan `npx expo start --tunnel` dan scan QR dengan Expo Go. QR ini hanya aktif selama perintah tersebut berjalan di laptop.
+4. **Mobile, APK Android**: ganti `EXPO_PUBLIC_API_URL` di `mobile/eas.json` dengan URL Render, lalu jalankan `npx eas-cli@latest login` dan `npx eas-cli@latest build -p android --profile preview`. Link dan QR untuk mengunduh APK muncul setelah build selesai.
 
 Render paket gratis akan "tidur" setelah 15 menit tanpa akses, sehingga request pertama bisa butuh sekitar satu menit.
 
@@ -53,7 +48,7 @@ Render paket gratis akan "tidur" setelah 15 menit tanpa akses, sehingga request 
 
 ```
 backend/   src/{config,models,controllers,routes,middleware,seed}, test/
-web/       src/{api,context,components,pages,lib}
+web/       src/{api,context,components,pages,lib}, public/theme-init.js
 mobile/    App.js, src/{api,context,components,screens,lib}, app.json, eas.json
 render.yaml
 ```

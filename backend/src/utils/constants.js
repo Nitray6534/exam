@@ -17,7 +17,12 @@ export const CATEGORIES = [
   {
     slug: 'teknologi',
     name: 'Teknologi',
-    description: 'Internet, cloud, dan keamanan digital sehari-hari.',
+    description: 'Cara kerja internet dan cloud computing.',
+  },
+  {
+    slug: 'keamanan-siber',
+    name: 'Keamanan Siber',
+    description: 'SIEM, kontrol akses, investigasi log, dan keamanan akun.',
   },
 ];
 

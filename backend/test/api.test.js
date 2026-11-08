@@ -83,7 +83,7 @@ test('daftar materi, filter kategori, dan pencarian', async () => {
   const auth = { Authorization: `Bearer ${token}` };
   const all = await request(app).get('/api/materials').set(auth);
   assert.equal(all.status, 200);
-  assert.equal(all.body.total, 17);
+  assert.equal(all.body.total, 21);
 
   const desain = await request(app).get('/api/materials?category=desain-grafis').set(auth);
   assert.ok(desain.body.items.every((m) => m.category === 'desain-grafis'));
@@ -92,7 +92,9 @@ test('daftar materi, filter kategori, dan pencarian', async () => {
   assert.ok(cari.body.total >= 1);
 
   const kategori = await request(app).get('/api/materials/categories').set(auth);
-  assert.equal(kategori.body.items.length, 4);
+  assert.equal(kategori.body.items.length, 5);
+  const siber = kategori.body.items.find((c) => c.slug === 'keamanan-siber');
+  assert.equal(siber.count, 6);
 });
 
 test('detail kuis tidak membocorkan kunci jawaban, submit kuis menghitung skor', async () => {

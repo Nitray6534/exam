@@ -6,9 +6,11 @@ import { seedDatabase } from './seed/seedData.js';
 async function start() {
   await connectDB();
 
+  // Sinkronkan materi dari kode ke database (upsert berdasarkan slug) setiap server start,
+  // sehingga materi baru otomatis muncul setelah deploy tanpa menghapus riwayat pengguna.
   if (env.autoSeed) {
-    const result = await seedDatabase({ onlyIfEmpty: true, demoUser: env.seedDemoUser });
-    if (result.seeded) console.log(`[seed] ${result.materials} materi awal ditambahkan`);
+    const result = await seedDatabase({ demoUser: env.seedDemoUser });
+    console.log(`[seed] ${result.materials} materi disinkronkan`);
   }
 
   const app = createApp();

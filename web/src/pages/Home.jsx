@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Search, X, ArrowRight, Layers, SearchX, Sparkles } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 import { CATEGORY_META, TYPE_META, categoryMeta, typeMeta } from '../lib/meta.js';
 import { useFavoriteToggle } from '../lib/useFavoriteToggle.js';
 import { CoverArt, EmptyState, MaterialCard, ProgressBar, Spinner } from '../components/ui.jsx';
@@ -38,6 +39,7 @@ function ContinueCard({ entry }) {
 
 export default function Home() {
   const { user } = useAuth();
+  const { dark } = useTheme();
   const [params, setParams] = useSearchParams();
   const category = params.get('kategori') || '';
   const type = params.get('tipe') || '';
@@ -143,7 +145,7 @@ export default function Home() {
                 role="tab"
                 aria-selected={active}
                 className={`chip ${active ? 'is-active' : ''}`}
-                style={active ? undefined : { '--chip-fg': meta.fg }}
+                style={active ? undefined : { '--chip-fg': dark ? meta.fgDark : meta.fg }}
                 onClick={() => setParam('kategori', c.slug)}
               >
                 <Icon size={16} aria-hidden /> {c.name} <span className="chip__count">{c.count}</span>

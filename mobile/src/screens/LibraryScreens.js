@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Alert, FlatList, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
@@ -7,19 +7,22 @@ import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useFavoriteToggle } from '../lib/useFavoriteToggle';
 import { Button, Cover, EmptyState, ErrorBox, Loading, MaterialCard, Pill, ProgressBar, T, useToast } from '../components/ui';
-import { categoryMeta, colors, initials, radius, timeAgo, typeMeta } from '../theme';
+import { categoryColors, initials, radius, timeAgo, typeMeta } from '../theme';
+import { useTheme, useStyles } from '../context/ThemeContext';
 
 function PageHeader({ eyebrow, title, subtitle, right }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   return (
     <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 12, marginBottom: 18 }}>
       <View style={{ flex: 1 }}>
-        <T weight="bold" size={11} color={colors.coral700} style={{ letterSpacing: 1 }}>
+        <T weight="bold" size={11} color={colors.accentText} style={{ letterSpacing: 1 }}>
           {eyebrow}
         </T>
         <T weight="extrabold" size={26} style={{ lineHeight: 33 }}>
           {title}
         </T>
-        {subtitle && <T color={colors.ink2}>{subtitle}</T>}
+        {subtitle && <T color={colors.text2}>{subtitle}</T>}
       </View>
       {right}
     </View>
@@ -28,6 +31,8 @@ function PageHeader({ eyebrow, title, subtitle, right }) {
 
 /* ================= Favorit ================= */
 export function FavoritesScreen({ navigation }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
   const [items, setItems] = useState(null);
   const [error, setError] = useState('');
@@ -53,7 +58,7 @@ export function FavoritesScreen({ navigation }) {
 
   return (
     <FlatList
-      style={{ flex: 1, backgroundColor: colors.cream }}
+      style={{ flex: 1, backgroundColor: colors.bg }}
       contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, paddingBottom: 32 }}
       data={items ?? []}
       keyExtractor={(m) => m.id}
@@ -99,6 +104,8 @@ export function FavoritesScreen({ navigation }) {
 
 /* ================= Riwayat ================= */
 function Stat({ icon, label, value, bg, fg }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   return (
     <View style={styles.stat}>
       <View style={[styles.statIcon, { backgroundColor: bg }]}>
@@ -108,7 +115,7 @@ function Stat({ icon, label, value, bg, fg }) {
         <T weight="extrabold" size={22} style={{ lineHeight: 26 }}>
           {value}
         </T>
-        <T weight="semibold" size={12} color={colors.ink2}>
+        <T weight="semibold" size={12} color={colors.text2}>
           {label}
         </T>
       </View>
@@ -128,6 +135,8 @@ function confirm(message, onYes) {
 }
 
 export function HistoryScreen({ navigation }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
   const toast = useToast();
   const [data, setData] = useState(null);
@@ -169,7 +178,7 @@ export function HistoryScreen({ navigation }) {
 
   return (
     <FlatList
-      style={{ flex: 1, backgroundColor: colors.cream }}
+      style={{ flex: 1, backgroundColor: colors.bg }}
       contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, paddingBottom: 32 }}
       data={items}
       keyExtractor={(h) => h.id}
@@ -181,8 +190,8 @@ export function HistoryScreen({ navigation }) {
             right={
               items.length > 0 && (
                 <Pressable onPress={clearAll} style={styles.clearBtn} accessibilityRole="button">
-                  <Feather name="trash-2" size={15} color={colors.red600} />
-                  <T weight="bold" size={13} color={colors.red600}>
+                  <Feather name="trash-2" size={15} color={colors.danger} />
+                  <T weight="bold" size={13} color={colors.danger}>
                     Hapus semua
                   </T>
                 </Pressable>
@@ -192,10 +201,10 @@ export function HistoryScreen({ navigation }) {
           <ErrorBox message={error} />
           {stats && (
             <View style={styles.stats}>
-              <Stat icon="book-open" label="Materi dibuka" value={stats.opened} bg={colors.pine100} fg={colors.pine800} />
-              <Stat icon="check-circle" label="Selesai" value={stats.completed} bg={colors.green100} fg={colors.green600} />
-              <Stat icon="zap" label="Sedang dipelajari" value={stats.inProgress} bg={colors.coral100} fg={colors.coral700} />
-              <Stat icon="award" label="Rata-rata kuis" value={stats.averageQuizScore ?? '-'} bg={colors.butter100} fg="#A16207" />
+              <Stat icon="book-open" label="Materi dibuka" value={stats.opened} bg={colors.primarySoft} fg={colors.primaryText} />
+              <Stat icon="check-circle" label="Selesai" value={stats.completed} bg={colors.successBg} fg={colors.success} />
+              <Stat icon="zap" label="Sedang dipelajari" value={stats.inProgress} bg={colors.accentSoft} fg={colors.accentText} />
+              <Stat icon="award" label="Rata-rata kuis" value={stats.averageQuizScore ?? '-'} bg={colors.warnBg} fg={colors.warnIcon} />
             </View>
           )}
         </View>
@@ -203,7 +212,7 @@ export function HistoryScreen({ navigation }) {
       ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
       renderItem={({ item: h }) => {
         const m = h.material;
-        const cat = categoryMeta(m.category);
+        const cat = categoryColors(m.category, dark);
         return (
           <Pressable
             style={styles.row}
@@ -224,13 +233,13 @@ export function HistoryScreen({ navigation }) {
                 </View>
                 {h.completed ? <Pill label="Selesai" /> : <T weight="bold" size={12}>{h.progress}%</T>}
               </View>
-              <T size={12} color={colors.ink3}>
+              <T size={12} color={colors.text3}>
                 Dibuka {timeAgo(h.lastAccessedAt)}
                 {typeof h.bestQuizScore === 'number' ? ` · skor terbaik ${h.bestQuizScore}` : ''}
               </T>
             </View>
             <Pressable onPress={() => remove(h)} hitSlop={10} style={styles.trash} accessibilityLabel="Hapus dari riwayat">
-              <Feather name="trash-2" size={18} color={colors.ink3} />
+              <Feather name="trash-2" size={18} color={colors.text3} />
             </Pressable>
           </Pressable>
         );
@@ -255,6 +264,8 @@ export function HistoryScreen({ navigation }) {
 
 /* ================= Profil ================= */
 export function ProfileScreen({ navigation }) {
+  const { colors, dark, toggle } = useTheme();
+  const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
   const { user, stats, refresh, logout } = useAuth();
 
@@ -270,13 +281,13 @@ export function ProfileScreen({ navigation }) {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: colors.cream }}
+      style={{ flex: 1, backgroundColor: colors.bg }}
       contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, paddingBottom: 32 }}
     >
       <PageHeader eyebrow="AKUN" title="Profil Saya" />
       <View style={styles.profileCard}>
         <View style={styles.avatarXl}>
-          <T weight="extrabold" size={28}>
+          <T weight="extrabold" size={28} color={colors.avatarText}>
             {initials(user?.name)}
           </T>
         </View>
@@ -284,12 +295,12 @@ export function ProfileScreen({ navigation }) {
           {user?.name}
         </T>
         <View style={styles.infoRow}>
-          <Feather name="mail" size={15} color={colors.ink3} />
-          <T color={colors.ink2}>{user?.email}</T>
+          <Feather name="mail" size={15} color={colors.text3} />
+          <T color={colors.text2}>{user?.email}</T>
         </View>
         <View style={styles.infoRow}>
-          <Feather name="calendar" size={15} color={colors.ink3} />
-          <T color={colors.ink2}>Bergabung {joined}</T>
+          <Feather name="calendar" size={15} color={colors.text3} />
+          <T color={colors.text2}>Bergabung {joined}</T>
         </View>
 
         <View style={styles.profileStats}>
@@ -299,26 +310,40 @@ export function ProfileScreen({ navigation }) {
             ['check-circle', stats?.completed ?? 0, 'Selesai', 'Riwayat'],
           ].map(([icon, value, label, target]) => (
             <Pressable key={label} style={styles.profileStat} onPress={() => navigation.navigate(target)}>
-              <Feather name={icon} size={18} color={colors.coral600} />
+              <Feather name={icon} size={18} color={colors.accentStrong} />
               <T weight="extrabold" size={22}>
                 {value}
               </T>
-              <T weight="semibold" size={12} color={colors.ink2}>
+              <T weight="semibold" size={12} color={colors.text2}>
                 {label}
               </T>
             </Pressable>
           ))}
         </View>
+        <View style={styles.themeRow}>
+          <Feather name={dark ? 'moon' : 'sun'} size={18} color={colors.text2} />
+          <T weight="semibold" style={{ flex: 1 }}>
+            Mode gelap
+          </T>
+          <Switch
+            value={dark}
+            onValueChange={toggle}
+            trackColor={{ false: colors.lineStrong, true: colors.primary }}
+            thumbColor="#FFFFFF"
+            accessibilityLabel="Mode gelap"
+          />
+        </View>
         <Button title="Keluar dari akun" icon="log-out" variant="danger" onPress={logout} style={{ alignSelf: 'stretch' }} />
       </View>
-      <T size={12} color={colors.ink3} style={{ textAlign: 'center', marginTop: 18 }}>
+      <T size={12} color={colors.text3} style={{ textAlign: 'center', marginTop: 18 }}>
         SkillLearn versi 1.0.0
       </T>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) =>
+  StyleSheet.create({
   clearBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -327,7 +352,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#F3C7C5',
+    borderColor: colors.dangerBorder,
   },
   stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 18 },
   stat: {
@@ -363,11 +388,24 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
     backgroundColor: colors.surface,
   },
+  themeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    alignSelf: 'stretch',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginBottom: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.surface2,
+  },
   avatarXl: {
     width: 84,
     height: 84,
     borderRadius: 42,
-    backgroundColor: colors.coral500,
+    backgroundColor: colors.avatarBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -381,6 +419,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.line,
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surface2,
   },
 });

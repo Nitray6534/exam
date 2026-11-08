@@ -6,11 +6,14 @@ import { StatusBar } from 'expo-status-bar';
 import { api } from '../api/client';
 import { Button, CategoryTag, Cover, EmptyState, FavoriteButton, Loading, ProgressBar, T, useToast } from '../components/ui';
 import { ArticleView, PracticeView, QuizView, VideoView } from '../components/MaterialViews';
-import { categoryMeta, colors, formatDuration, radius, typeMeta } from '../theme';
+import { categoryColors, formatDuration, radius, typeMeta } from '../theme';
+import { useTheme, useStyles } from '../context/ThemeContext';
 
 const VIEWS = { artikel: ArticleView, video: VideoView, kuis: QuizView, latihan: PracticeView };
 
 export default function DetailScreen({ route, navigation }) {
+  const { colors, dark } = useTheme();
+  const styles = useStyles(makeStyles);
   const { slug } = route.params;
   const insets = useSafeAreaInsets();
   const toast = useToast();
@@ -74,13 +77,13 @@ export default function DetailScreen({ route, navigation }) {
       accessibilityRole="button"
       accessibilityLabel="Kembali"
     >
-      <Feather name="arrow-left" size={20} color={colors.ink} />
+      <Feather name="arrow-left" size={20} color={colors.text} />
     </Pressable>
   );
 
   if (error) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.cream, padding: 16, paddingTop: insets.top + 70 }}>
+      <View style={{ flex: 1, backgroundColor: colors.bg, padding: 16, paddingTop: insets.top + 70 }}>
         {back}
         <EmptyState
           icon="file"
@@ -95,11 +98,11 @@ export default function DetailScreen({ route, navigation }) {
 
   const { material, history, related } = data;
   const View_ = VIEWS[material.type];
-  const cat = categoryMeta(material.category);
+  const cat = categoryColors(material.category, dark);
   const progress = history?.progress ?? 0;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.cream }}>
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <StatusBar style="light" />
       <ScrollView ref={scrollRef} contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}>
         <Cover
@@ -113,7 +116,7 @@ export default function DetailScreen({ route, navigation }) {
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <CategoryTag category={material.category} />
             <View style={styles.typeTag}>
-              <T weight="bold" size={12} color={colors.pine800}>
+              <T weight="bold" size={12} color={colors.primaryText}>
                 {typeMeta(material.type).label}
               </T>
             </View>
@@ -121,7 +124,7 @@ export default function DetailScreen({ route, navigation }) {
           <T weight="extrabold" size={24} style={{ lineHeight: 31 }}>
             {material.title}
           </T>
-          <T color={colors.ink2}>{material.summary}</T>
+          <T color={colors.text2}>{material.summary}</T>
           <View style={styles.meta}>
             {[
               ['activity', material.level],
@@ -129,8 +132,8 @@ export default function DetailScreen({ route, navigation }) {
               ['user', material.author],
             ].map(([icon, label]) => (
               <View key={icon} style={styles.metaItem}>
-                <Feather name={icon} size={14} color={colors.ink3} />
-                <T weight="semibold" size={13} color={colors.ink2}>
+                <Feather name={icon} size={14} color={colors.text3} />
+                <T weight="semibold" size={13} color={colors.text2}>
                   {label}
                 </T>
               </View>
@@ -144,7 +147,7 @@ export default function DetailScreen({ route, navigation }) {
               </T>
               <T weight="extrabold" size={18} color={cat.fg}>
                 {progress}%{' '}
-                <T weight="semibold" size={12} color={colors.ink2}>
+                <T weight="semibold" size={12} color={colors.text2}>
                   {history?.completed ? 'Selesai' : progress > 0 ? 'Sedang dipelajari' : 'Belum dimulai'}
                 </T>
               </T>
@@ -176,14 +179,14 @@ export default function DetailScreen({ route, navigation }) {
                 >
                   <Cover category={r.category} type={r.type} height={48} rounded={12} showType={false} style={{ width: 48 }} />
                   <View style={{ flex: 1 }}>
-                    <T weight="bold" size={12} color={colors.ink3}>
+                    <T weight="bold" size={12} color={colors.text3}>
                       {typeMeta(r.type).label}
                     </T>
                     <T weight="bold" size={14} numberOfLines={2}>
                       {r.title}
                     </T>
                   </View>
-                  <Feather name="chevron-right" size={18} color={colors.ink3} />
+                  <Feather name="chevron-right" size={18} color={colors.text3} />
                 </Pressable>
               ))}
             </View>
@@ -199,7 +202,8 @@ export default function DetailScreen({ route, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) =>
+  StyleSheet.create({
   roundBtn: {
     position: 'absolute',
     width: 42,
@@ -207,17 +211,17 @@ const styles = StyleSheet.create({
     borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.96)',
+    backgroundColor: colors.overlay,
   },
   sheet: {
     marginTop: -28,
     padding: 20,
     gap: 12,
-    backgroundColor: colors.cream,
+    backgroundColor: colors.bg,
     borderTopLeftRadius: radius.lg + 6,
     borderTopRightRadius: radius.lg + 6,
   },
-  typeTag: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 99, backgroundColor: colors.pine50 },
+  typeTag: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 99, backgroundColor: colors.primarySofter },
   meta: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   progressCard: {

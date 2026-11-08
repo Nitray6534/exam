@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { History as HistoryIcon, Trash2, BookOpen, CircleCheck, Flame, Trophy } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 import { categoryMeta, typeMeta, timeAgo } from '../lib/meta.js';
 import { CoverArt, EmptyState, ProgressBar, Spinner } from '../components/ui.jsx';
 
@@ -22,6 +23,7 @@ function Stat({ icon: Icon, label, value, tone }) {
 
 export default function History() {
   const toast = useToast();
+  const { dark } = useTheme();
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
 
@@ -69,14 +71,14 @@ export default function History() {
       </div>
 
       <div className="stats">
-        <Stat icon={BookOpen} label="Materi dibuka" value={stats.opened} tone="pine" />
+        <Stat icon={BookOpen} label="Materi dibuka" value={stats.opened} tone="primary" />
         <Stat icon={CircleCheck} label="Selesai" value={stats.completed} tone="green" />
-        <Stat icon={Flame} label="Sedang dipelajari" value={stats.inProgress} tone="coral" />
+        <Stat icon={Flame} label="Sedang dipelajari" value={stats.inProgress} tone="accent" />
         <Stat
           icon={Trophy}
           label="Rata-rata skor kuis"
           value={stats.averageQuizScore ?? '-'}
-          tone="butter"
+          tone="warn"
         />
       </div>
 
@@ -100,7 +102,7 @@ export default function History() {
               <li key={h.id} className="history__row">
                 <CoverArt category={m.category} type={m.type} size="xs" showType={false} />
                 <div className="history__main">
-                  <span className="history__meta" style={{ color: cat.fg }}>
+                  <span className="history__meta" style={{ color: dark ? cat.fgDark : cat.fg }}>
                     {cat.name} · {typeMeta(m.type).label}
                   </span>
                   <Link to={`/materi/${m.slug}`} className="history__title">

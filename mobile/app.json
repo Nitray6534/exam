@@ -5,8 +5,8 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "backgroundColor": "#FBF8F3",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#F8F7FC",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.skilllearn.mobile"
@@ -14,7 +14,7 @@
     "android": {
       "package": "app.skilllearn.mobile",
       "adaptiveIcon": {
-        "backgroundColor": "#0F4C45",
+        "backgroundColor": "#5B21B6",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
