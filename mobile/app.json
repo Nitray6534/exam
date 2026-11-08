@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "SkillLearn",
+    "slug": "skilllearn",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#FBF8F3",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.skilllearn.mobile"
+    },
+    "android": {
+      "package": "app.skilllearn.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#0F4C45",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "007d0e85-6957-47f3-a9bc-092d6ec40c59"
+      }
+    }
+  }
+}
