@@ -1,0 +1,18 @@
+{
+  "name": "skilllearn",
+  "private": true,
+  "description": "SkillLearn: platform belajar keterampilan praktis (web React, mobile React Native, API Express + MongoDB)",
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix web install && npm --prefix mobile install",
+    "build": "npm --prefix web ci --include=dev && npm --prefix web run build && npm --prefix backend ci --omit=dev",
+    "start": "npm --prefix backend start",
+    "dev:api": "npm --prefix backend run dev",
+    "dev:web": "npm --prefix web run dev",
+    "dev:mobile": "npm --prefix mobile start",
+    "seed": "npm --prefix backend run seed",
+    "test": "npm --prefix backend test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
