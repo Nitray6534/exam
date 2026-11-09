@@ -31,6 +31,9 @@ export function createApp() {
         },
       },
       crossOriginEmbedderPolicy: false,
+      // Default Helmet adalah 'no-referrer'. YouTube mewajibkan header Referer pada embed,
+      // tanpa itu video gagal dengan "Error 153: Video player configuration error".
+      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
     })
   );
 

@@ -89,6 +89,7 @@ export function VideoView({ material, history, onProgress }) {
           <iframe
             src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0`}
             title={sourceTitle}
+            referrerPolicy="strict-origin-when-cross-origin"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />

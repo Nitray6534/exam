@@ -10,6 +10,7 @@ export default function VideoPlayer({ youtubeId, title }) {
     return createElement('iframe', {
       src,
       title,
+      referrerPolicy: 'strict-origin-when-cross-origin',
       allow: 'autoplay; encrypted-media; picture-in-picture',
       allowFullScreen: true,
       style: { width: '100%', height: '100%', border: 0 },
