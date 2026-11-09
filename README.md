@@ -35,9 +35,9 @@ Saat development, aplikasi mobile otomatis memakai IP laptop (dari Metro) dengan
 
 Test API: `npm test` (13 integration test, memakai MongoDB in-memory).
 
-## Deploy gratis
+## Deploy
 
-1. **MongoDB Atlas**: buat cluster M0 (gratis), buat database user, di Network Access izinkan `0.0.0.0/0`, salin connection string.
+1. **MongoDB Atlas**: buat cluster M0, buat database user, di Network Access izinkan `0.0.0.0/0`, salin connection string.
 2. **Render** (web + API dalam satu service): push folder ini ke GitHub, lalu di Render pilih *New > Blueprint* dan arahkan ke repo. `render.yaml` sudah mengatur build (`npm run build`) dan start (`npm start`). Isi `MONGODB_URI` saat diminta. Setelah deploy, web dan API tersedia di `https://<nama-service>.onrender.com` (API di `/api`).
 3. **Mobile, QR Expo Go**: buat `mobile/.env` berisi `EXPO_PUBLIC_API_URL=https://<url-render-anda>`, lalu di folder `mobile` jalankan `npx expo start --tunnel` dan scan QR dengan Expo Go. QR ini hanya aktif selama perintah tersebut berjalan di laptop.
 4. **Mobile, APK Android**: ganti `EXPO_PUBLIC_API_URL` di `mobile/eas.json` dengan URL Render, lalu jalankan `npx eas-cli@latest login` dan `npx eas-cli@latest build -p android --profile preview`. Link dan QR untuk mengunduh APK muncul setelah build selesai.
